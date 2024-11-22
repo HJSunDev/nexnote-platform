@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useSearch } from "@/hooks/use-search";
+import { useSettings } from "@/hooks/use-settings";
 
 import { UserItem } from "./user-item";
 import { Item } from "./item";
@@ -35,6 +37,9 @@ export const Navigation = () => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+
+  const openSearch = useSearch((state) => state.onOpen);
+  const onOpenSettings = useSettings((state) => state.onOpen);
 
   useEffect(() => {
     if (isMobile) {
@@ -148,8 +153,8 @@ export const Navigation = () => {
         {/* 用户信息 */}
         <div>
           <UserItem></UserItem>
-          <Item label="Search" icon={Search} isSearch onClick={() => {}}></Item>
-          <Item label="Settings" icon={Settings} onClick={() => {}}></Item>
+          <Item label="Search" icon={Search} isSearch onClick={openSearch}></Item>
+          <Item label="Settings" icon={Settings} onClick={onOpenSettings}></Item>
           <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
         {/* 文档列表 */}
