@@ -94,7 +94,7 @@ export const get = query({
     }
 });
 
-
+// 获取侧边栏文档
 export const getSidebar = query({
     args: {
         parentDocument: v.optional(v.id("documents")),
@@ -281,5 +281,75 @@ export const getSearch = query({
         .collect();
 
         return documents;
+    }
+})
+
+// 根据ID获取文档
+export const getById = query({
+    args: { documentId: v.id("documents") },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        const document = await ctx.db.get(args.documentId);
+
+        if(!document) {
+            throw new Error("Document not found");
+        }
+
+        // 如果文档是已发布的并且未归档，则返回文档
+        if(document.isPublished && !document.isArchived) {
+            return document;
+        }
+
+        if(!identity) {
+            throw new Error("Unauthorized");
+        }
+
+        const userId = identity.subject;
+
+        if(document.userId !== userId) {
+            throw new Error("Unauthorized");
+        }
+
+        return document;
+    }
+})
+
+// 更新文档
+export const update = mutation({
+    args: {
+        id: v.id("documents"),
+        title: v.string(),
+        content: v.optional(v.string()),
+        coverImage: v.optional(v.string()),
+        icon: v.optional(v.string()),
+        isPublished: v.optional(v.boolean()),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if(!identity) {
+            throw new Error("Unauthorized");
+        }
+
+        const userId = identity.subject;
+
+        const { id, ...rest } = args;
+
+        const existingDocument = await ctx.db.get(id);
+
+        if(!existingDocument) {
+            throw new Error("Document not found");
+        }
+
+        if(existingDocument.userId !== userId) {
+            throw new Error("Unauthorized");
+        }
+
+        const document = await ctx.db.patch(id, {   
+            ...rest,
+        });
+
+        return document;
     }
 })
