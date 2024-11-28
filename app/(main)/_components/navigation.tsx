@@ -9,7 +9,7 @@ import {
   Settings,
   Trash,
 } from "lucide-react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useMutation } from "convex/react";
@@ -28,6 +28,7 @@ import { TrashBox } from "./trash-box";
 import { Navbar } from "./navbar";
 
 export const Navigation = () => {
+  const router = useRouter();
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -139,7 +140,10 @@ export const Navigation = () => {
   };
 
   const handleCreate = () => {
-    const promise = create({ title: "Untitled" });
+    const promise = create({ title: "Untitled" })
+      .then((documentId) => {
+        router.push(`/documents/${documentId}`);
+      });
 
     toast.promise(promise, {
       loading: "Creating a new note...",
@@ -170,14 +174,14 @@ export const Navigation = () => {
         >
           <ChevronsLeft className="h-6 w-6"></ChevronsLeft>
         </div>
-        {/* 用户信息 */}
+        {/* 用户信息、搜索、设置、新建文档 */}
         <div>
           <UserItem></UserItem>
           <Item label="Search" icon={Search} isSearch onClick={openSearch}></Item>
           <Item label="Settings" icon={Settings} onClick={onOpenSettings}></Item>
           <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
-        {/* 文档列表 */}
+        {/* 文档列表、新建文档、垃圾桶 */}
         <div className="mt-4">
           <DocumentList />
           <Item onClick={handleCreate} icon={Plus} label="Add a page" />

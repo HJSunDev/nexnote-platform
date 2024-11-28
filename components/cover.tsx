@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { useCoverImage } from "@/hooks/use-cover-image";
 
 import { useEdgeStore } from "@/lib/edgestore";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface CoverProps {
@@ -78,5 +79,11 @@ export const Cover = ({ url, preview }: CoverProps) => {
         </div>
       )}
     </div>
+  )
+}
+
+Cover.Skeleton = function CoverSkeleton(){
+  return (
+    <Skeleton className="w-full h-[12vh]"></Skeleton>
   )
 }

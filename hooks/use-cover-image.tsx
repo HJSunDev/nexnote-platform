@@ -16,7 +16,7 @@ export const useCoverImage = create<CoverImageStore>((set) => ({
     // 初始状态为关闭
     isOpen: false,
     // 打开模态框的方法，将 isOpen 设置为 true
-    onOpen: () => set({isOpen: true}),
+    onOpen: () => set({isOpen: true, url: undefined}),
     // 关闭模态框的方法，将 isOpen 设置为 false
     onClose: () => set({isOpen: false, url: undefined}),
     // 替换封面图片的方法，将 url 设置为新的封面图片 URL

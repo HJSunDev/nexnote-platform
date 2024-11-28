@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/clerk-react";
 import { useMutation } from "convex/react";
 import { ChevronDown, ChevronRight, LucideIcon, MoreHorizontal, Plus, Trash } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface ItemProps {
@@ -39,7 +39,7 @@ export const Item = ({
 
   const { user } = useUser();
 
-  // const router = useRouter();
+  const router = useRouter();
   const create = useMutation(api.documents.create);
   const archive = useMutation(api.documents.archive);
 
@@ -48,9 +48,8 @@ export const Item = ({
   ) => {
     event.stopPropagation();
     if(!id) return;
-    const promise = archive({ id }).then(()=> {
-      toast.success("Document archived!");
-    });
+    const promise = archive({ id })
+      .then(() => { router.push("/documents") });
 
     toast.promise(promise, {
       loading: "Archiving note...",
@@ -81,7 +80,7 @@ export const Item = ({
       if(!expanded) {
         onExpand?.();
       }
-      // router.push(`/documents/${documentId}`);
+      router.push(`/documents/${documentId}`);
     });
 
     toast.promise(promise, {
@@ -117,7 +116,7 @@ export const Item = ({
       {documentIcon ? (
         <div className="shrink-0 mr-2 text-[18px]">{documentIcon}</div>
       ) : (
-        <Icon className="shrink-0 h-[18px] mr-2 text-muted-foreground" />
+        <Icon className="shrink-0 h-[18px] w-[18px] mr-2 text-muted-foreground" />
       )}
       {/* 文档标题 */}
       <span className="truncate">{label}</span>

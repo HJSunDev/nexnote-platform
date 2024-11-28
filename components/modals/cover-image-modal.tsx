@@ -41,21 +41,14 @@ export const CoverImageModal = () => {
       // 更新文件状态
       setFile(file);
 
-      let res;
-      // 如果当前有封面图片，则使用 replaceTargetUrl 选项替换已有的封面图片
-      if(url){
-        res = await edgestore.publicFiles.upload({
-          file,
-          options: {
-            replaceTargetUrl: url,
-          }
-        })
-      }else{
-        // 否则，直接上传新的封面图片
-        res = await edgestore.publicFiles.upload({
-          file
-        });
-      }
+      // 如果为替换则有url，replaceTargetUrl生效，为替换图片
+      // 如果为新上传，则没有url即url为undefined，replaceTargetUrl不生效，只是上传图片
+      const res = await edgestore.publicFiles.upload({
+        file,
+        options: {
+          replaceTargetUrl: url,
+        }
+      })
 
       // 更新文档的封面图片 URL
       await update({

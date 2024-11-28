@@ -284,33 +284,51 @@ export const getSearch = query({
     }
 })
 
-// 根据ID获取文档
+/**
+ * 根据文档ID获取文档内容
+ * 实现了基于发布状态的访问控制：
+ * 1. 已发布文档：所有人可访问
+ * 2. 未发布文档：仅文档所有者可访问
+ */
 export const getById = query({
+    // 定义参数类型：需要文档ID
     args: { documentId: v.id("documents") },
     handler: async (ctx, args) => {
+        // 获取当前访问者的身份信息
         const identity = await ctx.auth.getUserIdentity();
 
+        // 从数据库获取指定ID的文档
         const document = await ctx.db.get(args.documentId);
 
+        // 如果文档不存在，抛出错误
         if(!document) {
             throw new Error("Document not found");
         }
 
-        // 如果文档是已发布的并且未归档，则返回文档
+        // 访问控制逻辑：
+        // 条件1：文档已发布（isPublished=true）
+        // 条件2：文档未归档（isArchived=false）
+        // 满足这两个条件的文档允许公开访问
         if(document.isPublished && !document.isArchived) {
             return document;
         }
 
+        // 对于未发布或已归档的文档：
+        // 检查访问者是否已登录
         if(!identity) {
             throw new Error("Unauthorized");
         }
 
+        // 获取访问者的用户ID
         const userId = identity.subject;
 
+        // 检查访问者是否为文档所有者
+        // 只有文档所有者才能访问未发布的文档
         if(document.userId !== userId) {
             throw new Error("Unauthorized");
         }
 
+        // 返回文档内容
         return document;
     }
 })
