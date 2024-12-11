@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, use } from "react";
 
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -13,12 +13,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface DocumentIdPageProps {
     params: {
-        documentId: Id<"documents">;
-    }
-}
+      documentId: Id<"documents">;
+    } | Promise<{
+      documentId: Id<"documents">;
+    }>;
+  }
 
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
+    // 使用 use 解包 params，同时处理两种可能的类型
+    const resolvedParams = params instanceof Promise ? use(params) : params;
+    const { documentId } = resolvedParams;
+
     //dynamic 实现了代码分割和按需加载,减少了初始 bundle 大小，加快了首次加载速度
     //useMemo 确保 dynamic 函数只被调用一次，即使父组件重新渲染,防止在每次渲染时重新创建动态组件
     //{ ssr: false } 确保 Editor 组件只在客户端渲染
@@ -28,7 +34,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     const update = useMutation(api.documents.update);
 
     const document = useQuery(api.documents.getById, {
-        documentId: params.documentId,
+        documentId,
     });
     
 
@@ -54,7 +60,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
 
     const onContentChange = (content: string) => {
         update({
-            id: params.documentId,
+            id: documentId,
             content,
         });
     }
