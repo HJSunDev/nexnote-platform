@@ -26,7 +26,7 @@ export const Cover = ({ url, preview }: CoverProps) => {
 
   const params = useParams();
 
-  const { isOpen, onOpen, onReplace} = useCoverImage();
+  const { onReplace} = useCoverImage();
 
   const removeCoverImage = useMutation(api.documents.removeCoverImage);
 

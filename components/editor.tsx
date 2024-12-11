@@ -6,14 +6,12 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
 import {
-  Block,
   BlockNoteEditor,
   PartialBlock
 } from "@blocknote/core";
 
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
-import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
 import { useEdgeStore } from "@/lib/edgestore";
@@ -41,7 +39,7 @@ const Editor = ({
     return response.url;
   }
 
-  const editor = useCreateBlockNote(
+  const editor: BlockNoteEditor = useCreateBlockNote(
     {
       initialContent: initialContent ? JSON.parse(initialContent) as PartialBlock[] : undefined,
       uploadFile: handleUpload,
